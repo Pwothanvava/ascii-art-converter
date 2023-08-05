@@ -1,0 +1,95 @@
+<html>
+<head>
+    <title>Image to ASCII Art Converter</title>
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: monospace;
+            text-align: center;
+            padding: 20px;
+        }
+        img {
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+        /* Style the label as a button */
+        .upload-btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image to ASCII Art Converter</h1>
+    <label for="imageInput" class="upload-btn">Choose File</label>
+    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+    <div id="asciiOutput"></div>
+    <a id="downloadLink" style="display: none;" download="ascii_art.jpg">Download ASCII Art</a>
+
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function() {
+            var file = this.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var img = new Image();
+                    img.onload = function() {
+                        var asciiArt = imageToAscii(this, 100, ['0', '1']);
+                        displayAscii(asciiArt);
+                        createAndDownloadAsciiImage(asciiArt);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function imageToAscii(image, newWidth, asciiChars) {
+            // The same imageToAscii function as before
+            // ...
+
+            return asciiArt;
+        }
+
+        function displayAscii(asciiArt) {
+            var outputDiv = document.getElementById('asciiOutput');
+            outputDiv.innerHTML = '<pre>' + asciiArt + '</pre>';
+        }
+
+        function createAndDownloadAsciiImage(asciiArt) {
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+
+            // Set canvas dimensions based on the number of lines and characters in the ASCII art
+            var lines = asciiArt.split('\n');
+            var numLines = lines.length;
+            var numChars = Math.max(...lines.map(line => line.length));
+            var fontSize = 10; // Adjust the font size as needed for your desired resolution
+
+            canvas.width = numChars * fontSize;
+            canvas.height = numLines * fontSize;
+
+            // Draw the ASCII art on the canvas
+            context.font = fontSize + 'px monospace';
+            context.fillStyle = 'black'; // Set the color for the ASCII art
+            for (var y = 0; y < numLines; y++) {
+                for (var x = 0; x < lines[y].length; x++) {
+                    context.fillText(lines[y][x], x * fontSize, (y + 1) * fontSize);
+                }
+            }
+
+            // Convert canvas to image and create a download link
+            var imgURL = canvas.toDataURL('image/jpeg');
+            var downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = imgURL;
+            downloadLink.style.display = 'block';
+
+            // Trigger the download
+            downloadLink.click();
+        }
+    </script>
+</body>
+</html>
